@@ -15,6 +15,7 @@ import { supabase } from './services/supabaseClient';
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<GatekeeperState>(GatekeeperState.BOOTING);
+  const [isAuthResolving, setIsAuthResolving] = useState(true);
 
   // Load initial avatar from storage or default
   const [userAvatar, setUserAvatar] = useState<AvatarConfig>(() => {
@@ -40,11 +41,10 @@ const App: React.FC = () => {
   useEffect(() => {
     // 1. Handle OAuth Redirect immediately on mount
     const checkRedirect = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      // Small artificial delay to ensure Supabase client has processed hash if applicable
+      await new Promise(r => setTimeout(r, 100));
 
-      // If returning from provider (hash contains tokens) OR just have a valid active session
-      // AND we are in the default booting state, we might want to restore Admin if that was the intent.
-      // However, usually we only force Admin if we are SURE they were logging in (Redirect).
+      const { data: { session } } = await supabase.auth.getSession();
 
       const isRedirect = window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery');
 
@@ -54,8 +54,13 @@ const App: React.FC = () => {
           setAppState(GatekeeperState.ADMIN);
           // Optional: Clear hash to clean URL? 
           // window.history.replaceState(null, '', window.location.pathname);
+        } else if (appState === GatekeeperState.BOOTING) {
+          // If we have an active session during boot, skip boot and go to admin?
+          // User preference: usually users want to go to Admin if they are logged in.
+          setAppState(GatekeeperState.ADMIN);
         }
       }
+      setIsAuthResolving(false);
     };
 
     checkRedirect();
@@ -102,11 +107,21 @@ const App: React.FC = () => {
     );
   }
 
+  if (isAuthResolving) {
+    return (
+      <div className="h-screen w-full bg-black text-terminal-green font-mono flex items-center justify-center p-4">
+        <div className="animate-pulse">INITIALIZING SECURE UPLINK...</div>
+      </div>
+    );
+  }
+
   const handleAvatarComplete = (config: AvatarConfig) => {
     setUserAvatar(config);
     // Persist avatar setting
     localStorage.setItem('gatekeeper_avatar_v1', JSON.stringify(config));
-    setAppState(GatekeeperState.ACTIVE);
+    if (appState !== GatekeeperState.ADMIN) {
+      setAppState(GatekeeperState.ACTIVE);
+    }
   };
 
   const handleSessionUpdate = (data: VisitorSessionData) => {
@@ -118,7 +133,10 @@ const App: React.FC = () => {
       <Scanlines />
 
       {appState === GatekeeperState.BOOTING && (
-        <BootScreen onComplete={() => setAppState(GatekeeperState.CUSTOMIZING)} />
+        <BootScreen onComplete={() => {
+          // Only transition if we are NOT already upgraded to Admin by auth listener
+          setAppState(prev => prev === GatekeeperState.BOOTING ? GatekeeperState.CUSTOMIZING : prev);
+        }} />
       )}
 
       {appState === GatekeeperState.CUSTOMIZING && (
