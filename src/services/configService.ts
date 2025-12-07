@@ -16,16 +16,15 @@ const DEFAULT_CONFIG: AdminConfig = {
 
 export const getConfig = async (): Promise<AdminConfig> => {
   try {
-    const { data, error } = await supabase
+    const { data: queryData, error: queryError } = await supabase
       .from(TABLE)
       .select('config_json')
       .order('updated_at', { ascending: false })
-      .limit(1)
-      .single();
+      .limit(1);
 
-    if (error || !data) return DEFAULT_CONFIG;
+    if (queryError || !queryData || queryData.length === 0) return DEFAULT_CONFIG;
 
-    return data.config_json as AdminConfig;
+    return queryData[0].config_json as AdminConfig;
   } catch {
     return DEFAULT_CONFIG;
   }

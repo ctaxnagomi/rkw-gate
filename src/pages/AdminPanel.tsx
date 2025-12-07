@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Lock, Save, AlertTriangle, Settings, LayoutTemplate, Shield, Plus, Trash2, Play, Upload } from 'lucide-react';
 import { GatekeeperState, AdminConfig, MorsePair } from '../types';
 import { getConfig, saveConfig } from '../services/configService';
+import { signOut } from '../services/authService';
 
 interface AdminPanelProps {
   onStateChange: (state: GatekeeperState) => void;
@@ -83,7 +84,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onStateChange }) => {
               <p className="text-xs text-terminal-dim">ROOT ACCESS GRANTED</p>
             </div>
           </div>
-          import {signOut} from '../services/authService';
+
 
           // ... inside the component
           <button
