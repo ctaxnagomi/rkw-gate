@@ -7,8 +7,8 @@ import { initializeChat, sendMessage as sendGeminiMessage } from '../services/ge
 import { logAttempt } from '../services/auditService';
 import { getStats } from '../services/statsService';
 import { getConfig } from '../services/configService';
-import ThinkingIndicator from './ThinkingIndicator';
-import PixelAvatar from './PixelAvatar';
+import ThinkingIndicator from '../components/ThinkingIndicator';
+import PixelAvatar from '../components/PixelAvatar';
 
 interface TerminalProps {
   onStateChange: (state: GatekeeperState) => void;

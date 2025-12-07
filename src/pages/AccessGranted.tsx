@@ -82,13 +82,13 @@ const AccessGranted: React.FC<AccessGrantedProps> = ({ previewData, sessionData 
               </p>
             </div>
             <div className="flex gap-4">
-              <a href="#" className="p-3 rounded-full bg-zinc-900 hover:bg-zinc-800 transition-colors border border-zinc-800">
+              <a href="#" aria-label="GitHub Profile" className="p-3 rounded-full bg-zinc-900 hover:bg-zinc-800 transition-colors border border-zinc-800">
                 <Github size={20} />
               </a>
-              <a href="#" className="p-3 rounded-full bg-zinc-900 hover:bg-zinc-800 transition-colors border border-zinc-800">
+              <a href="#" aria-label="LinkedIn Profile" className="p-3 rounded-full bg-zinc-900 hover:bg-zinc-800 transition-colors border border-zinc-800">
                 <Linkedin size={20} />
               </a>
-              <a href="#" className="p-3 rounded-full bg-zinc-900 hover:bg-zinc-800 transition-colors border border-zinc-800">
+              <a href="#" aria-label="Email Contact" className="p-3 rounded-full bg-zinc-900 hover:bg-zinc-800 transition-colors border border-zinc-800">
                 <Mail size={20} />
               </a>
             </div>

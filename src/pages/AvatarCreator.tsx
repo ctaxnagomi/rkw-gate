@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react';
 import { AvatarConfig } from '../types';
-import PixelAvatar, { AVATAR_OPTIONS } from './PixelAvatar';
+import PixelAvatar, { AVATAR_OPTIONS } from '../components/PixelAvatar';
 
 interface AvatarCreatorProps {
   initialConfig?: AvatarConfig;
@@ -46,7 +46,7 @@ const AvatarCreator: React.FC<AvatarCreatorProps> = ({ initialConfig, onComplete
         </div>
 
         <div className="mt-8 flex flex-col items-center gap-8">
-          
+
           {/* Preview Box */}
           <div className="relative w-48 h-48 border border-terminal-green/30 bg-terminal-dim/10 flex items-center justify-center">
             <div className="absolute inset-0 border-t border-terminal-green/20 animate-scanline pointer-events-none"></div>
@@ -55,14 +55,14 @@ const AvatarCreator: React.FC<AvatarCreatorProps> = ({ initialConfig, onComplete
 
           {/* Controls */}
           <div className="w-full space-y-4 font-mono text-sm">
-            
+
             {/* Head Selector */}
             <div className="flex items-center justify-between group">
               <span className="text-terminal-green/70">HEAD_MODULE</span>
               <div className="flex items-center gap-2">
-                <button onClick={() => cycle('headId', -1)} className="hover:text-terminal-amber"><ChevronLeft /></button>
+                <button onClick={() => cycle('headId', -1)} className="hover:text-terminal-amber" aria-label="Previous Head"><ChevronLeft /></button>
                 <span className="w-8 text-center text-terminal-green">{config.headId + 1}</span>
-                <button onClick={() => cycle('headId', 1)} className="hover:text-terminal-amber"><ChevronRight /></button>
+                <button onClick={() => cycle('headId', 1)} className="hover:text-terminal-amber" aria-label="Next Head"><ChevronRight /></button>
               </div>
             </div>
 
@@ -70,9 +70,9 @@ const AvatarCreator: React.FC<AvatarCreatorProps> = ({ initialConfig, onComplete
             <div className="flex items-center justify-between group">
               <span className="text-terminal-green/70">CHASSIS</span>
               <div className="flex items-center gap-2">
-                <button onClick={() => cycle('bodyId', -1)} className="hover:text-terminal-amber"><ChevronLeft /></button>
+                <button onClick={() => cycle('bodyId', -1)} className="hover:text-terminal-amber" aria-label="Previous Body"><ChevronLeft /></button>
                 <span className="w-8 text-center text-terminal-green">{config.bodyId + 1}</span>
-                <button onClick={() => cycle('bodyId', 1)} className="hover:text-terminal-amber"><ChevronRight /></button>
+                <button onClick={() => cycle('bodyId', 1)} className="hover:text-terminal-amber" aria-label="Next Body"><ChevronRight /></button>
               </div>
             </div>
 
@@ -80,25 +80,25 @@ const AvatarCreator: React.FC<AvatarCreatorProps> = ({ initialConfig, onComplete
             <div className="flex items-center justify-between group">
               <span className="text-terminal-green/70">ADD_ON</span>
               <div className="flex items-center gap-2">
-                <button onClick={() => cycle('accessoryId', -1)} className="hover:text-terminal-amber"><ChevronLeft /></button>
+                <button onClick={() => cycle('accessoryId', -1)} className="hover:text-terminal-amber" aria-label="Previous Accessory"><ChevronLeft /></button>
                 <span className="w-8 text-center text-terminal-green">{config.accessoryId}</span>
-                <button onClick={() => cycle('accessoryId', 1)} className="hover:text-terminal-amber"><ChevronRight /></button>
+                <button onClick={() => cycle('accessoryId', 1)} className="hover:text-terminal-amber" aria-label="Next Accessory"><ChevronRight /></button>
               </div>
             </div>
 
-             {/* Color Selector */}
-             <div className="flex items-center justify-between group">
+            {/* Color Selector */}
+            <div className="flex items-center justify-between group">
               <span className="text-terminal-green/70">SIGNATURE</span>
               <div className="flex items-center gap-2">
-                <button onClick={() => cycle('color', -1)} className="hover:text-terminal-amber"><ChevronLeft /></button>
+                <button onClick={() => cycle('color', -1)} className="hover:text-terminal-amber" aria-label="Previous Color"><ChevronLeft /></button>
                 <div className="w-8 h-4 border border-terminal-dim" style={{ backgroundColor: config.color }}></div>
-                <button onClick={() => cycle('color', 1)} className="hover:text-terminal-amber"><ChevronRight /></button>
+                <button onClick={() => cycle('color', 1)} className="hover:text-terminal-amber" aria-label="Next Color"><ChevronRight /></button>
               </div>
             </div>
 
           </div>
 
-          <button 
+          <button
             onClick={() => onComplete(config)}
             className="w-full py-3 mt-4 border border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-black transition-colors font-retro text-xl flex items-center justify-center gap-2 uppercase"
           >

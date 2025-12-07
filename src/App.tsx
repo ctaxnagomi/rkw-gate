@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { GatekeeperState, AvatarConfig, VisitorSessionData } from './types';
-import BootScreen from './components/BootScreen';
-import AvatarCreator from './components/AvatarCreator';
-import Terminal from './components/Terminal';
+import BootScreen from './pages/BootScreen';
+import AvatarCreator from './pages/AvatarCreator';
+import Terminal from './pages/Terminal';
 import Scanlines from './components/Scanlines';
-import AccessGranted from './components/AccessGranted';
-import AccessDenied from './components/AccessDenied';
-import LoginScreen from './components/LoginScreen';
-import AdminPanel from './components/AdminPanel';
-import ProfileBuilder from './components/ProfileBuilder';
+import AccessGranted from './pages/AccessGranted';
+import AccessDenied from './pages/AccessDenied';
+import LoginScreen from './pages/LoginScreen';
+import AdminPanel from './pages/AdminPanel';
+import ProfileBuilder from './pages/ProfileBuilder';
 
 import { onAuthStateChange } from './services/authService';
 import { supabase } from './services/supabaseClient';
