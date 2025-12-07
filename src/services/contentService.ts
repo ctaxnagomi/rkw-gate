@@ -66,22 +66,28 @@ const DEFAULT_PORTFOLIO: PortfolioConfig = {
 };
 
 // Async now required for DB Ops, but we might init with defaults
-export const getPortfolioConfig = async (): Promise<PortfolioConfig> => {
+export const getPortfolioConfig = async (specificUserId?: string): Promise<PortfolioConfig> => {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from(TABLE)
-      .select('config_json')
+      .select('config_json, user_id')
       .order('updated_at', { ascending: false })
-      .limit(1)
-      .single();
+      .limit(1);
+
+    // If a specific user is requested (e.g. the logged in editor), filter by it.
+    // Otherwise it fetches the latest global config (Visitor Mode for single-tenant sites).
+    if (specificUserId) {
+      query = query.eq('user_id', specificUserId);
+    }
+
+    const { data, error } = await query.single();
 
     if (error || !data) {
-      // If no data, return default
+      // If no data found for this user, return default.
+      // This is expected for a new user logging in for the first time.
       return DEFAULT_PORTFOLIO;
     }
 
-    // Safety: config_json is typed as JSONB in SQL, returned as object/any here.
-    // We assume it matches the shape. Simple validation could go here.
     return data.config_json as PortfolioConfig;
 
   } catch (e) {
@@ -92,22 +98,28 @@ export const getPortfolioConfig = async (): Promise<PortfolioConfig> => {
 
 export const savePortfolioConfig = async (config: PortfolioConfig) => {
   try {
-    // Insert new row to keep history (or update existing if you prefer)
-    // Here we insert a new version every save for simplicity/history
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("Must be logged in to save configuration.");
+    }
+
+    // Insert new row with user_id to keep ownership
     const { error } = await supabase
       .from(TABLE)
       .insert([
-        { config_json: config }
+        {
+          config_json: config,
+          user_id: user.id
+        }
       ]);
 
     if (error) {
       console.error("Supabase Save Error", error);
       alert("Failed to save to Database: " + error.message);
-    } else {
-      // Optional: Cache locally?
-      // localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(config)); 
     }
   } catch (e) {
     console.error("Failed to save portfolio config", e);
+    alert(e instanceof Error ? e.message : "Unknown error saving config");
   }
 };

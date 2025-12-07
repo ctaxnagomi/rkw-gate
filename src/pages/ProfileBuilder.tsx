@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Eye, EyeOff, Save, Layers, Edit2, LayoutTemplate, Monitor, Plus, Trash2, ChevronDown, ChevronRight, Image as ImageIcon, Link as LinkIcon, Github } from 'lucide-react';
 import { GatekeeperState, PortfolioConfig, ProjectItem } from '../types';
 import { getPortfolioConfig, savePortfolioConfig } from '../services/contentService';
+import { supabase } from '../services/supabaseClient';
 import AccessGranted from './AccessGranted';
 
 interface ProfileBuilderProps {
@@ -16,7 +17,16 @@ const ProfileBuilder: React.FC<ProfileBuilderProps> = ({ onStateChange }) => {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   useEffect(() => {
-    getPortfolioConfig().then(setConfig);
+    // 1. Get current user
+    // 2. Fetch THEIR config
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        getPortfolioConfig(user.id).then(setConfig);
+      } else {
+        // Fallback or redirect? For now, load default.
+        getPortfolioConfig().then(setConfig);
+      }
+    });
   }, []);
 
   if (!config) return <div className="text-terminal-green">LOADING_BUILDER...</div>;
@@ -166,6 +176,7 @@ const ProfileBuilder: React.FC<ProfileBuilderProps> = ({ onStateChange }) => {
                           value={config.hero.title}
                           onChange={(e) => updateField('hero', 'title', e.target.value)}
                           className="w-full bg-zinc-900 border border-zinc-800 p-2 text-zinc-200 focus:border-terminal-green outline-none rounded-sm"
+                          aria-label="Hero Title"
                         />
                       </div>
                       <div className="space-y-1">
@@ -174,6 +185,7 @@ const ProfileBuilder: React.FC<ProfileBuilderProps> = ({ onStateChange }) => {
                           value={config.hero.subtitle}
                           onChange={(e) => updateField('hero', 'subtitle', e.target.value)}
                           className="w-full bg-zinc-900 border border-zinc-800 p-2 text-zinc-200 focus:border-terminal-green outline-none rounded-sm h-20"
+                          aria-label="Hero Subtitle"
                         />
                       </div>
                     </>
@@ -189,6 +201,7 @@ const ProfileBuilder: React.FC<ProfileBuilderProps> = ({ onStateChange }) => {
                           value={config.about.title}
                           onChange={(e) => updateField('about', 'title', e.target.value)}
                           className="w-full bg-zinc-900 border border-zinc-800 p-2 text-zinc-200 focus:border-terminal-green outline-none rounded-sm"
+                          aria-label="About Section Title"
                         />
                       </div>
                       <div className="space-y-1">
@@ -197,6 +210,7 @@ const ProfileBuilder: React.FC<ProfileBuilderProps> = ({ onStateChange }) => {
                           value={config.about.content}
                           onChange={(e) => updateField('about', 'content', e.target.value)}
                           className="w-full bg-zinc-900 border border-zinc-800 p-2 text-zinc-200 focus:border-terminal-green outline-none rounded-sm h-32"
+                          aria-label="About Content"
                         />
                       </div>
                     </>
@@ -212,6 +226,7 @@ const ProfileBuilder: React.FC<ProfileBuilderProps> = ({ onStateChange }) => {
                           value={config.stats.experience}
                           onChange={(e) => updateField('stats', 'experience', e.target.value)}
                           className="w-full bg-zinc-900 border border-zinc-800 p-2 text-zinc-200 focus:border-terminal-green outline-none rounded-sm"
+                          aria-label="Years Experience"
                         />
                       </div>
                       <div className="space-y-1">
@@ -221,6 +236,7 @@ const ProfileBuilder: React.FC<ProfileBuilderProps> = ({ onStateChange }) => {
                           value={config.stats.projects}
                           onChange={(e) => updateField('stats', 'projects', e.target.value)}
                           className="w-full bg-zinc-900 border border-zinc-800 p-2 text-zinc-200 focus:border-terminal-green outline-none rounded-sm"
+                          aria-label="Project Count"
                         />
                       </div>
                     </>
@@ -257,6 +273,7 @@ const ProfileBuilder: React.FC<ProfileBuilderProps> = ({ onStateChange }) => {
                           value={config.projects.title}
                           onChange={(e) => updateField('projects', 'title', e.target.value)}
                           className="w-full bg-zinc-900 border border-zinc-800 p-2 text-zinc-200 focus:border-terminal-green outline-none rounded-sm mb-2"
+                          aria-label="Projects Section Title"
                         />
                       </div>
 
