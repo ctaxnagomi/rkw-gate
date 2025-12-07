@@ -3,17 +3,20 @@
 
 **A Retro 8-Bit Portfolio Guardian & Builder**
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/815395f3-681b-46aa-a24a-88771899243c/deploy-status)](https://app.netlify.com/projects/krackkeddev-payfirstthenview-gateway/deploys)
+
 This application acts as a gatekeeper to your professional portfolio, using logic-based interviews to screen visitors (Browsers, Recruiters, Bots). Once access is granted, it renders a dynamic, customizable portfolio page.
 
 ## 🏗 Architecture (Frontend-First)
 
 Currently, this application runs entirely on the **Client-Side**. To ensure zero-cost deployment and ease of use, all persistence is handled via the browser's `localStorage`.
 
-### Data Storage Locations:
-1.  **Configuration**: `gatekeeper_config_v1` (Admin settings, Bot Trap Key)
-2.  **Portfolio Content**: `gatekeeper_portfolio_v1` (Projects, About, Hero text, GitHub)
-3.  **Audit Logs**: `gatekeeper_logs_v1` (Interview transcripts & screenshots)
-4.  **Statistics**: `gatekeeper_stats_v1` (Visitor counters)
+### Data Storage Locations
+
+1. **Configuration**: `gatekeeper_config_v1` (Admin settings, Bot Trap Key)
+2. **Portfolio Content**: `gatekeeper_portfolio_v1` (Projects, About, Hero text, GitHub)
+3. **Audit Logs**: `gatekeeper_logs_v1` (Interview transcripts & screenshots)
+4. **Statistics**: `gatekeeper_stats_v1` (Visitor counters)
 
 ---
 
@@ -22,6 +25,7 @@ Currently, this application runs entirely on the **Client-Side**. To ensure zero
 To make this application production-ready with persistent data across devices, you must replace the `localStorage` logic with real API calls.
 
 ### 1. Database Schema (SQL Example)
+
 If using **Supabase**, **PostgreSQL**, or **MySQL**, create the following tables:
 
 ```sql
@@ -77,9 +81,11 @@ CREATE TABLE admin_config (
 ```
 
 ### 2. Service Integration
+
 You need to modify the files in the `services/` directory.
 
 #### `services/contentService.ts`
+
 Replace `localStorage.getItem` with `fetch` or your DB client.
 
 ```typescript
@@ -94,6 +100,7 @@ export const getPortfolioConfig = async () => {
 ```
 
 #### `services/auditService.ts`
+
 Replace `saveToLocal` with a POST request.
 
 ```typescript
@@ -111,6 +118,7 @@ export const logAttempt = async (entry) => {
 ```
 
 #### `services/statsService.ts`
+
 Implement atomic increments on your server to prevent race conditions.
 
 ```typescript
@@ -121,11 +129,13 @@ export const incrementStat = async (type) => {
 ```
 
 ### 3. Authentication & GitHub Stats Autofill
+
 The current `LoginScreen.tsx` is a simulation.
-1.  Integrate **Firebase Auth**, **Supabase Auth**, or **Auth0**.
-2.  In `LoginScreen.tsx`, replace `handleLogin` with your provider's login function.
-3.  Protect your API endpoints using the JWT token received from the auth provider.
-4.  **GitHub Stats**: If you implement GitHub OAuth login, your backend should extract the username from the OAuth profile and update the `github_json` field in `portfolio_config` automatically.
+
+1. Integrate **Firebase Auth**, **Supabase Auth**, or **Auth0**.
+2. In `LoginScreen.tsx`, replace `handleLogin` with your provider's login function.
+3. Protect your API endpoints using the JWT token received from the auth provider.
+4. **GitHub Stats**: If you implement GitHub OAuth login, your backend should extract the username from the OAuth profile and update the `github_json` field in `portfolio_config` automatically.
 
 ---
 
@@ -134,6 +144,7 @@ The current `LoginScreen.tsx` is a simulation.
 If you are manually populating the database or `localStorage`, adhere to these JSON structures.
 
 ### Portfolio Config (`portfolio_config` / `localStorage`)
+
 ```json
 {
   "hero": {
@@ -174,6 +185,7 @@ If you are manually populating the database or `localStorage`, adhere to these J
 ```
 
 ### Admin Config (`admin_config` / `localStorage`)
+
 ```json
 {
   "botTrapKey": " Seahorse ",
