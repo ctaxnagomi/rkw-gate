@@ -11,11 +11,12 @@ declare global {
 }
 
 interface AccessGrantedProps {
-  previewData?: PortfolioConfig; // If provided, acts as a controlled component (Preview Mode)
-  sessionData?: VisitorSessionData; // Optional data from the gatekeeper session
+  previewData?: PortfolioConfig | null; // For ProfileBuilder preview
+  sessionData?: VisitorSessionData;     // From Gatekeeper
+  targetUserId?: string | null;         // For Visitor Link
 }
 
-const AccessGranted: React.FC<AccessGrantedProps> = ({ previewData, sessionData }) => {
+const AccessGranted: React.FC<AccessGrantedProps> = ({ previewData, sessionData, targetUserId }) => {
   const [data, setData] = useState<PortfolioConfig | null>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
 
@@ -23,9 +24,11 @@ const AccessGranted: React.FC<AccessGrantedProps> = ({ previewData, sessionData 
     if (previewData) {
       setData(previewData);
     } else {
-      getPortfolioConfig().then(setData);
+      // If targetUserId is present, fetch THAT user's config.
+      // Otherwise fetch default/global.
+      getPortfolioConfig(targetUserId || undefined).then(setData);
     }
-  }, [previewData]);
+  }, [previewData, targetUserId]);
 
   // Initializing GitHub Calendar with Debounce and Ref Safety
   useEffect(() => {

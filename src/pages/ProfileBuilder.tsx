@@ -6,21 +6,25 @@ import { getPortfolioConfig, savePortfolioConfig } from '../services/contentServ
 import { supabase } from '../services/supabaseClient';
 import AccessGranted from './AccessGranted';
 
+import { QRCodeSVG } from 'qrcode.react';
+
 interface ProfileBuilderProps {
   onStateChange: (state: GatekeeperState) => void;
 }
 
 const ProfileBuilder: React.FC<ProfileBuilderProps> = ({ onStateChange }) => {
   const [config, setConfig] = useState<PortfolioConfig | null>(null);
-  const [activeSection, setActiveSection] = useState<keyof PortfolioConfig | null>(null);
+  const [section, setSection] = useState<'hero' | 'about' | 'stats' | 'projects' | 'github'>('hero');
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     // 1. Get current user
     // 2. Fetch THEIR config
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
+        setUserId(user.id);
         getPortfolioConfig(user.id).then(setConfig);
       } else {
         // Fallback or redirect? For now, load default.
@@ -391,6 +395,22 @@ const ProfileBuilder: React.FC<ProfileBuilderProps> = ({ onStateChange }) => {
             <ArrowLeft size={14} />
             Exit to Admin
           </button>
+          {userId && (
+            <div className="bg-white/90 p-3 rounded flex flex-col items-center gap-2 mb-2">
+              <QRCodeSVG value={`${window.location.origin}/?target=${userId}`} size={80} />
+              <div className="text-center">
+                <p className="text-[10px] uppercase font-bold text-black mb-1">Visitor Link</p>
+                <a
+                  href={`/?target=${userId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[9px] text-blue-800 hover:underline block max-w-[150px] truncate"
+                >
+                  {window.location.origin}/?target={userId}
+                </a>
+              </div>
+            </div>
+          )}
           {lastSaved && (
             <div className="text-[10px] text-center text-terminal-green/70 font-mono">
               Saved: {lastSaved.toLocaleTimeString()}

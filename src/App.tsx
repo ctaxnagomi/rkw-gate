@@ -17,6 +17,10 @@ const App: React.FC = () => {
   const [appState, setAppState] = useState<GatekeeperState>(GatekeeperState.BOOTING);
   const [isAuthResolving, setIsAuthResolving] = useState(true);
 
+  // Capture target user ID from URL (Visitor Mode)
+  const isVisitorParam = new URLSearchParams(window.location.search).get('target');
+  const [targetUserId, setTargetUserId] = useState<string | null>(isVisitorParam);
+
   // Load initial avatar from storage or default
   const [userAvatar, setUserAvatar] = useState<AvatarConfig>(() => {
     try {

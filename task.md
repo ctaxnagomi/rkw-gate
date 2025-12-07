@@ -58,5 +58,7 @@
   - [x] Build Production (`npm run build`)
   - [x] Setup Environment Variables in Netlify
   - [x] Deploy to Netlify
-  - [ ] Update Supabase Redirect URLs
-  - [ ] Update OAuth Provider Origins (Google/GitHub)
+  - [x] Update Supabase Redirect URLs
+  - [x] Update OAuth Provider Origins (Google/GitHub)
+  - [x] Implement Multi-User Visitor Links (`?target=uid`)
+  - [x] Add QR Code Generator to Profile Builder
