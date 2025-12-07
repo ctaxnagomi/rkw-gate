@@ -10,7 +10,8 @@ import LoginScreen from './components/LoginScreen';
 import AdminPanel from './components/AdminPanel';
 import ProfileBuilder from './components/ProfileBuilder';
 
-import { onAuthStateChange, getCurrentSession } from './services/authService';
+import { onAuthStateChange } from './services/authService';
+import { supabase } from './services/supabaseClient';
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<GatekeeperState>(GatekeeperState.BOOTING);
@@ -37,29 +38,57 @@ const App: React.FC = () => {
   const hasKey = !!process.env.API_KEY;
 
   useEffect(() => {
-    // Check initial session
-    getCurrentSession().then(session => {
-      if (session && window.location.hash.includes('access_token')) {
-        // If returning from OAuth redirect
-        setAppState(GatekeeperState.ADMIN);
-      }
-    });
+    // 1. Handle OAuth Redirect immediately on mount
+    const checkRedirect = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
 
-    const { data: { subscription } } = onAuthStateChange((session) => {
-      // If user logs in successfully, move to ADMIN
-      if (session && appState === GatekeeperState.LOGIN) {
-        setAppState(GatekeeperState.ADMIN);
+      // If returning from provider (hash contains tokens) OR just have a valid active session
+      // AND we are in the default booting state, we might want to restore Admin if that was the intent.
+      // However, usually we only force Admin if we are SURE they were logging in (Redirect).
+
+      const isRedirect = window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery');
+
+      if (session) {
+        if (isRedirect) {
+          // Definitely coming from login -> Go to Admin
+          setAppState(GatekeeperState.ADMIN);
+          // Optional: Clear hash to clean URL? 
+          // window.history.replaceState(null, '', window.location.pathname);
+        }
       }
-      // If user logs out, move to ACTIVE (Terminal)
-      if (!session && appState === GatekeeperState.ADMIN) {
-        setAppState(GatekeeperState.ACTIVE);
+    };
+
+    checkRedirect();
+
+    // 2. Listen for Auth Changes continuously
+    const { data: { subscription } } = onAuthStateChange((session) => {
+      if (session) {
+        // If user is effectively "Logging In" (was in Login screen, or Booting up)
+        setAppState((prev) => {
+          if (prev === GatekeeperState.LOGIN || prev === GatekeeperState.BOOTING) {
+            return GatekeeperState.ADMIN;
+          }
+          return prev; // Stay in current state if already active (e.g. don't kick user out of Builder)
+        });
+      } else {
+        // Logged out
+        setAppState((prev) => {
+          // Only redirect to Active if they were in a protected route
+          if (prev === GatekeeperState.ADMIN || prev === GatekeeperState.BUILDER) {
+            return GatekeeperState.ACTIVE;
+          }
+          return prev;
+        });
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [appState]);
+  }, []); // Run once on mount (dependency array empty to avoid churn)
+
+  // Also checking session specifically when entering LOGIN state could be useful, 
+  // but the listener above handles the transition if the session is already there.
 
   if (!hasKey) {
     return (
