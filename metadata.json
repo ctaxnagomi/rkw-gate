@@ -1,0 +1,5 @@
+{
+  "name": "RKW-AI-Gatekeeper Web",
+  "description": "A retro 8-bit AI gatekeeper for your portfolio that interviews visitors using Gemini before granting access.",
+  "requestFramePermissions": []
+}
